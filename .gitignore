@@ -1,0 +1,9 @@
+## ide
+**/.idea
+*.iml
+
+## backend
+**/target
+**/logs
+
+
