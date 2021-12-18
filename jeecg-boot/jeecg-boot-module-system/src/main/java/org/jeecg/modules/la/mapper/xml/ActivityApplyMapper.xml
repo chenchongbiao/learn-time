@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.la.mapper.ActivityApplyMapper">
+    <resultMap id="ActivityApplyVo" type="org.jeecg.modules.la.vo.ActivityApplyVo" >
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="activityId" property="activityId" jdbcType="VARCHAR"/>
+        <result column="userId" property="userId" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="actTime" property="actTime" jdbcType="INTEGER"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="realname" property="realname" jdbcType="VARCHAR"/>
+        <result column="typeName" property="typeName" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--  根据用户id和活动id获取参与活动数据  -->
+    <select id="getActivitiyApplyListByUserIdAndActId" parameterType="String"  resultMap="ActivityApplyVo">
+        SELECT
+            apy.id,
+            act.id activityId,
+            act.activity_time actTime,
+            act.`status` status,
+            sys_user.id userId,
+            sys_user.username,
+            sys_user.realname,
+            type.`name` typeName,
+            apy.create_time,
+            apy.update_time
+        FROM
+            activity_apply apy
+        LEFT OUTER JOIN activity act ON apy.activity_id = act.id
+        LEFT OUTER JOIN sys_user ON apy.user_id = sys_user.id
+        LEFT JOIN learn_time_type type ON act.type_id = type.id
+            <if test="userId != null and userId !='' and activityId != null and activityId !='' " >
+                WHERE
+                    apy.user_id = #{userId}
+                and act.id = #{activityId}
+            </if>
+            <if test="userId != null and userId !=''" >
+                WHERE
+                    apy.user_id = #{userId}
+            </if>
+            <if test="activityId != null and activityId !=''" >
+                WHERE
+                    act.id = #{activityId}
+            </if>
+<!--        <if test="status != null and status !=''" >-->
+<!--            and status = #{status}-->
+<!--        </if>-->
+        order by create_time DESC
+    </select>
+
+    <select id="getSumLearnTimeByUserId" parameterType="java.lang.String"  resultType="java.lang.Integer">
+        SELECT
+            SUM(act.activity_time) sumTime
+        FROM
+            activity_apply apy
+        LEFT OUTER JOIN activity act ON apy.activity_id = act.id
+        LEFT OUTER JOIN sys_user ON apy.user_id = sys_user.id
+        LEFT JOIN learn_time_type type ON act.type_id = type.id
+        WHERE
+            sys_user.id = #{userId}
+    </select>
+
+</mapper>
