@@ -27,7 +27,7 @@
     <!-- update-end author:sunjianlei date:20191220 for: 解决全局样式冲突的问题 -->
     <!-- update_end  author:zhaoxin date:20191129 for: 做头部菜单栏导航 -->
     <span class="action">
-      <a class="logout_title" target="_blank" href="http://doc.jeecg.com">
+      <a class="logout_title" target="_blank" href="">
         <a-icon type="question-circle-o"></a-icon>
       </a>
     </span>
