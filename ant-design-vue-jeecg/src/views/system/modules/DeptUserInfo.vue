@@ -135,16 +135,16 @@
             align: "center",
             dataIndex: 'orgCode'
           },
-          {
-            title: '性别',
-            align: "center",
-            dataIndex: 'sex_dictText'
-          },
-          {
-            title: '电话',
-            align: "center",
-            dataIndex: 'phone'
-          },
+          // {
+          //   title: '性别',
+          //   align: "center",
+          //   dataIndex: 'sex_dictText'
+          // },
+          // {
+          //   title: '电话',
+          //   align: "center",
+          //   dataIndex: 'phone'
+          // },
           {
             title: '操作',
             dataIndex: 'action',

@@ -95,7 +95,7 @@
                 <template v-if="orgCategoryDisabled">
                   <a-radio-group v-model="model.orgCategory" placeholder="请选择机构类型">
                     <a-radio value="1">
-                      公司
+                      学院
                     </a-radio>
                   </a-radio-group>
                 </template>
@@ -110,18 +110,18 @@
                   </a-radio-group>
                 </template>
               </a-form-model-item>
-              <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="排序">
-                <a-input-number v-model="model.departOrder" />
-              </a-form-model-item>
-              <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="手机号">
-                <a-input placeholder="请输入手机号" v-model="model.mobile" />
-              </a-form-model-item>
-              <a-form-model-item  :labelCol="labelCol" :wrapperCol="wrapperCol"  label="地址">
-                <a-input placeholder="请输入地址" v-model="model.address"/>
-              </a-form-model-item>
-              <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">
-                <a-textarea placeholder="请输入备注" v-model="model.memo"/>
-              </a-form-model-item>
+<!--              <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="排序">-->
+<!--                <a-input-number v-model="model.departOrder" />-->
+<!--              </a-form-model-item>-->
+<!--              <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="手机号">-->
+<!--                <a-input placeholder="请输入手机号" v-model="model.mobile" />-->
+<!--              </a-form-model-item>-->
+<!--              <a-form-model-item  :labelCol="labelCol" :wrapperCol="wrapperCol"  label="地址">-->
+<!--                <a-input placeholder="请输入地址" v-model="model.address"/>-->
+<!--              </a-form-model-item>-->
+<!--              <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">-->
+<!--                <a-textarea placeholder="请输入备注" v-model="model.memo"/>-->
+<!--              </a-form-model-item>-->
             </a-form-model>
             <div class="anty-form-btn">
               <a-button @click="emptyCurrForm" type="default" htmlType="button" icon="sync">重置</a-button>

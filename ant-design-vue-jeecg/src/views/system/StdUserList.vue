@@ -84,6 +84,7 @@
       </a-upload>
       <j-third-app-button biz-type="user" :selected-row-keys="selectedRowKeys" syncToApp syncToLocal @sync-finally="onSyncFinally"/>
       <a-button type="primary" icon="hdd" @click="recycleBinVisible=true">回收站</a-button>
+
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay" @click="handleMenuClick">
           <a-menu-item key="1">
@@ -191,7 +192,7 @@
 </template>
 
 <script>
-  import UserModal from './modules/UserModal'
+  import UserModal from './modules/StdUserModal'
   import PasswordModal from './modules/PasswordModal'
   import {putAction,getFileAccessHttpUrl} from '@/api/manage';
   import {frozenBatch} from '@/api/api'
@@ -267,37 +268,37 @@
             sorter: true
           },
           {
-            title: '创新创业素质学时',
+            title: '创新创业素质',
             align: "center",
-            width: 80,
+            width: 100,
             dataIndex: 'innovation',
             sorter: true
           },
           {
-            title: '思想品德素质学时',
+            title: '思想品德素质',
             align: "center",
-            width: 80,
+            width: 100,
             dataIndex: 'thought',
             sorter: true
           },
           {
-            title: '身心素质学时',
+            title: '身心素质',
             align: "center",
-            width: 80,
+            width: 100,
             dataIndex: 'bodyMind',
             sorter: true
           },
           {
-            title: '法律素养学时',
+            title: '法律素养',
             align: "center",
-            width: 80,
+            width: 100,
             dataIndex: 'law',
             sorter: true
           },
           {
-            title: '文体素质学时',
+            title: '文体素质',
             align: "center",
-            width: 80,
+            width: 100,
             dataIndex: 'cultureSports',
             sorter: true
           },
@@ -332,12 +333,12 @@
           //   width: 180,
           //   dataIndex: 'orgCode'
           // },
-          {
-            title: '负责部门',
-            align: "center",
-            width: 180,
-            dataIndex: 'departIds_dictText'
-          },
+          // {
+          //   title: '负责部门',
+          //   align: "center",
+          //   width: 180,
+          //   dataIndex: 'departIds_dictText'
+          // },
           {
             title: '状态',
             align: "center",
@@ -361,7 +362,7 @@
         ],
         url: {
           syncUser: "/act/process/extActProcess/doSyncUser",
-          list: "/sys/user/list",
+          list: "/sys/user/stdlist",
           delete: "/sys/user/delete",
           deleteBatch: "/sys/user/deleteBatch",
           exportXlsUrl: "/sys/user/exportXls",

@@ -40,7 +40,7 @@
           <a-input placeholder="请输入用户姓名" v-model="model.realname" />
         </a-form-model-item>
 
-        <a-form-model-item label="负责年级" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="grade">
+        <a-form-model-item label="所在年级" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="grade">
           <a-input placeholder="请输入年级" v-model="model.grade" />
         </a-form-model-item>
 
@@ -56,19 +56,19 @@
 <!--          <j-select-position placeholder="请选择职务" :multiple="false" v-model="model.post"/>-->
 <!--        </a-form-model-item>-->
 
-        <a-form-model-item label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!roleDisabled" >
-          <j-multi-select-tag
-            :disabled="disableSubmit"
-            v-model="model.selectedroles"
-            :options="rolesOptions"
-            placeholder="请选择角色">
-          </j-multi-select-tag>
-        </a-form-model-item>
+<!--        <a-form-model-item label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!roleDisabled" >-->
+<!--          <j-multi-select-tag-->
+<!--            :disabled="disableSubmit"-->
+<!--            v-model="model.selectedroles"-->
+<!--            :options="rolesOptions"-->
+<!--            placeholder="请选择角色">-->
+<!--          </j-multi-select-tag>-->
+<!--        </a-form-model-item>-->
 
         <!--部门分配-->
-        <a-form-model-item label="部门分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">
-          <j-select-depart v-model="model.selecteddeparts" :multi="true" @back="backDepartInfo" :backDepart="true" :treeOpera="true">></j-select-depart>
-        </a-form-model-item>
+<!--        <a-form-model-item label="部门分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">-->
+<!--          <j-select-depart v-model="model.selecteddeparts" :multi="true" @back="backDepartInfo" :backDepart="true" :treeOpera="true">></j-select-depart>-->
+<!--        </a-form-model-item>-->
 
         <!--租户分配-->
 <!--        <a-form-model-item label="租户分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">-->
@@ -83,7 +83,7 @@
         <a-form-model-item label="身份" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-radio-group  v-model="model.userIdentity"  @change="identityChange">
             <a-radio :value="1">普通用户</a-radio>
-            <a-radio :value="2">上级</a-radio>
+<!--            <a-radio :value="2">上级</a-radio>-->
           </a-radio-group>
         </a-form-model-item>
         <a-form-model-item label="负责部门" :labelCol="labelCol" :wrapperCol="wrapperCol"  v-if="departIdShow==true">
@@ -214,7 +214,7 @@
       const token = Vue.ls.get(ACCESS_TOKEN);
       this.headers = {"X-Access-Token":token}
       this.initRoleList()
-      this.initTenantList()
+      // this.initTenantList()
     },
     computed:{
       uploadAction:function () {
@@ -268,25 +268,39 @@
         }
       },
       //初始化租户字典
-      initTenantList(){
-        getAction(this.url.queryTenantList).then(res=>{
-          if(res.success){
-            this.tenantsOptions = res.result.map((item,index,arr)=>{
-              let c = {label:item.name, value: item.id+""}
-              return c;
-            })
-            console.log('this.tenantsOptions: ',this.tenantsOptions)
-          }
-        })
-      },
+      // initTenantList(){
+      //   getAction(this.url.queryTenantList).then(res=>{
+      //     if(res.success){
+      //       this.tenantsOptions = res.result.map((item,index,arr)=>{
+      //         let c = {label:item.name, value: item.id+""}
+      //         return c;
+      //       })
+      //       console.log('this.tenantsOptions: ',this.tenantsOptions)
+      //     }
+      //   })
+      // },
       //初始化角色字典
       initRoleList(){
         queryall().then((res)=>{
           if(res.success){
-            this.rolesOptions = res.result.map((item,index,arr)=>{
-              let c = {label:item.roleName, value:item.id}
-              return c;
-            })
+            for (let i = 0; i < res.result.length; i++) {
+              if (res.result[i].roleName == "学生"){
+                //新增负责部门选择下拉框
+                this.rolesOptions.push({
+                  value: res.result[i].id,
+                  label: res.result[i].roleName
+                })
+              }
+            }
+
+
+            // this.rolesOptions = res.result.map((item,index,arr)=>{
+            //   if (item.roleName == "学生"){
+            //     console.log(res.result.length)
+            //     let c = {label:item.roleName, value:item.id}
+            //     return c;
+            //   }
+            // })
             console.log('this.rolesOptions: ',this.rolesOptions)
           }
         });
