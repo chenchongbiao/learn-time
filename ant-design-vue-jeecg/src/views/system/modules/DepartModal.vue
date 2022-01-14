@@ -19,7 +19,7 @@
           prop="departName"
           :hidden="false"
           hasFeedback >
-          <a-input id="departName" placeholder="请输入机构/部门名称" v-model="model.departName"/>
+          <a-input id="departName" placeholder="请输入学院名称名称" v-model="model.departName"/>
         </a-form-model-item>
         <a-form-model-item :labelCol="labelCol" :wrapperCol="wrapperCol" :hidden="seen" label="上级部门" hasFeedback>
         <a-tree-select
@@ -38,7 +38,7 @@
          <template v-if="seen">
             <a-radio-group v-model="model.orgCategory" placeholder="请选择机构类型">
               <a-radio value="1">
-                公司
+                学院
               </a-radio>
             </a-radio-group>
           </template>
@@ -53,37 +53,37 @@
             </a-radio-group>
        </template>
         </a-form-model-item>
-        <a-form-model-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          prop="mobile"
-          label="电话">
-          <a-input placeholder="请输入电话" v-model="model.mobile"/>
-        </a-form-model-item>
-        <a-form-model-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="传真">
-          <a-input placeholder="请输入传真" v-model="model.fax"/>
-        </a-form-model-item>
-        <a-form-model-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="地址">
-          <a-input placeholder="请输入地址" v-model="model.address"/>
-        </a-form-model-item>
-        <a-form-model-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="排序">
-          <a-input-number v-model="model.departOrder"/>
-        </a-form-model-item>
-        <a-form-model-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="备注">
-          <a-textarea placeholder="请输入备注" v-model="model.memo"/>
-        </a-form-model-item>
+<!--        <a-form-model-item-->
+<!--          :labelCol="labelCol"-->
+<!--          :wrapperCol="wrapperCol"-->
+<!--          prop="mobile"-->
+<!--          label="电话">-->
+<!--          <a-input placeholder="请输入电话" v-model="model.mobile"/>-->
+<!--        </a-form-model-item>-->
+<!--        <a-form-model-item-->
+<!--          :labelCol="labelCol"-->
+<!--          :wrapperCol="wrapperCol"-->
+<!--          label="传真">-->
+<!--          <a-input placeholder="请输入传真" v-model="model.fax"/>-->
+<!--        </a-form-model-item>-->
+<!--        <a-form-model-item-->
+<!--          :labelCol="labelCol"-->
+<!--          :wrapperCol="wrapperCol"-->
+<!--          label="地址">-->
+<!--          <a-input placeholder="请输入地址" v-model="model.address"/>-->
+<!--        </a-form-model-item>-->
+<!--        <a-form-model-item-->
+<!--          :labelCol="labelCol"-->
+<!--          :wrapperCol="wrapperCol"-->
+<!--          label="排序">-->
+<!--          <a-input-number v-model="model.departOrder"/>-->
+<!--        </a-form-model-item>-->
+<!--        <a-form-model-item-->
+<!--          :labelCol="labelCol"-->
+<!--          :wrapperCol="wrapperCol"-->
+<!--          label="备注">-->
+<!--          <a-textarea placeholder="请输入备注" v-model="model.memo"/>-->
+<!--        </a-form-model-item>-->
 
       </a-form-model>
     </a-spin>
