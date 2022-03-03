@@ -35,15 +35,15 @@
     <a-dropdown>
       <span class="action action-full ant-dropdown-link user-dropdown-menu">
         <a-avatar class="avatar" size="small" :src="getAvatar()"/>
-        <span v-if="isDesktop()">欢迎您，{{ nickname() }}</span>
+        <span v-if="isDesktop()">欢迎您，{{ realname }}</span>
       </span>
       <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
-        <a-menu-item key="0">
-          <router-link :to="{ name: 'account-center' }">
-            <a-icon type="user"/>
-            <span>个人中心</span>
-          </router-link>
-        </a-menu-item>
+<!--        <a-menu-item key="0">-->
+<!--          <router-link :to="{ name: 'account-center' }">-->
+<!--            <a-icon type="user"/>-->
+<!--            <span>个人中心</span>-->
+<!--          </router-link>-->
+<!--        </a-menu-item>-->
         <a-menu-item key="1">
           <router-link :to="{ name: 'account-settings-base' }">
             <a-icon type="setting"/>
@@ -58,10 +58,10 @@
           <a-icon type="setting"/>
           <span>密码修改</span>
         </a-menu-item>
-        <a-menu-item key="5" @click="updateCurrentDepart">
-          <a-icon type="cluster"/>
-          <span>切换部门</span>
-        </a-menu-item>
+<!--        <a-menu-item key="5" @click="updateCurrentDepart">-->
+<!--          <a-icon type="cluster"/>-->
+<!--          <span>切换部门</span>-->
+<!--        </a-menu-item>-->
         <a-menu-item key="6" @click="clearCache">
           <a-icon type="sync"/>
           <span>清理缓存</span>
@@ -112,6 +112,7 @@
         searchMenuComp: 'span',
         searchMenuVisible: false,
         // update-begin author:sunjianlei date:20200219 for: 头部菜单搜索规范命名 --------------
+        realname: ''
       }
     },
     components: {
@@ -132,6 +133,7 @@
       let lists = []
       this.searchMenus(lists,this.permissionMenuList)
       this.searchMenuOptions=[...lists]
+      this.realname = this.userInfo().realname
     },
     mounted() {
       //如果是单点登录模式
