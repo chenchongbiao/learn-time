@@ -15,15 +15,15 @@
                 基本设置
               </a>
             </a-menu-item>
-            <a-menu-item key="security">
-              <a @click="securityClick()">安全设置</a>
-            </a-menu-item>
+<!--            <a-menu-item key="security">-->
+<!--              <a @click="securityClick()">安全设置</a>-->
+<!--            </a-menu-item>-->
             <a-menu-item key="custom">
               <a @click="customClick()"> 个性化</a>
             </a-menu-item>
-            <a-menu-item key="binding">
-              <a @click="bindingClick()">账户绑定</a>
-            </a-menu-item>
+<!--            <a-menu-item key="binding">-->
+<!--              <a @click="bindingClick()">账户绑定</a>-->
+<!--            </a-menu-item>-->
             <a-menu-item key="notification">
               <a @click="notificationClick()">新消息通知</a>
             </a-menu-item>
@@ -91,7 +91,7 @@
         },
 
         pageTitle: '',
-        title:"基本设置",
+        title:"个人信息",
         security:false,
         baseSetting:true,
         custom:false,
@@ -120,16 +120,16 @@
         this.notification=false
         this.binding=false
         this.baseSetting=true
-        this.title="基本设置"
+        this.title="个人信息"
       },
-      securityClick(){
-        this.baseSetting=false
-        this.custom=false;
-        this.notification=false
-        this.binding=false
-        this.security=true
-        this.title="安全设置"
-      },
+      // securityClick(){
+      //   this.baseSetting=false
+      //   this.custom=false;
+      //   this.notification=false
+      //   this.binding=false
+      //   this.security=true
+      //   this.title="安全设置"
+      // },
       notificationClick(){
         this.security=false
         this.custom=false
@@ -138,14 +138,14 @@
         this.notification=true
         this.title="新消息通知"
       },
-      bindingClick(){
-        this.security=false
-        this.baseSetting=false
-        this.notification=false;
-        this.custom=false;
-        this.binding=true
-        this.title="账号绑定"
-      },
+      // bindingClick(){
+      //   this.security=false
+      //   this.baseSetting=false
+      //   this.notification=false;
+      //   this.custom=false;
+      //   this.binding=true
+      //   this.title="账号绑定"
+      // },
       customClick(){
         this.security=false
         this.baseSetting=false
