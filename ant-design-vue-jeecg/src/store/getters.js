@@ -18,6 +18,18 @@ const getters = {
     return state.enhance.enhanceJs[code]
   },
   sysSafeMode: state => state.user.sysSafeMode,
+  // 1普通用回顾 2管理员
+  userIdentity: (state) => {state.user.userIdentity = Vue.ls.get(USER_INFO).userIdentity;return state.user.userIdentity},
+  // 法律素养学时
+  law: (state) => {state.user.law = Vue.ls.get(USER_INFO).law;return state.user.law},
+  // 身心素质学时
+  bodyMind: (state) => {state.user.bodyMind = Vue.ls.get(USER_INFO).bodyMind;return state.user.bodyMind},
+  // 创新创业素质学时
+  innovation: (state) => {state.user.innovation = Vue.ls.get(USER_INFO).innovation;return state.user.innovation},
+  // 思想品德素质学时
+  thought: (state) => {state.user.thought = Vue.ls.get(USER_INFO).thought;return state.user.thought},
+  // 文体素质学时
+  cultureSports: (state) => {state.user.cultureSports = Vue.ls.get(USER_INFO).cultureSports;return state.user.cultureSports},
 
 }
 
