@@ -140,4 +140,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return
 	 */
 	List<SysUser> queryByDepIds(@Param("departIds")List<String> departIds,@Param("username") String username);
+
+	/**
+	 * 批量修改用户的学时
+	 * @param sysUserList
+	 * @return
+	 */
+	int updateSysUserCredit(@Param("sysUserList") List<SysUser> sysUserList);
 }

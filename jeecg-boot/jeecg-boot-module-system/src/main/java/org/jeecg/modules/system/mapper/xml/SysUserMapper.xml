@@ -162,4 +162,39 @@
 			and username != #{username}
 		</if>
 	</select>
+
+	<!--https://blog.csdn.net/q957967519/article/details/88669552-->
+	<!--批量修改用户的学时信息信息-->
+	<update id="updateSysUserCredit">
+		<foreach collection="sysUserList" item="sysUser" index="index" open="" close="" separator=";">
+			update sys_user
+			<set>
+				<if test="sysUser.innovation != null" >
+					innovation = #{sysUser.innovation,jdbcType=DOUBLE},
+				</if>
+				<if test="sysUser.thought != null" >
+					thought = #{sysUser.thought,jdbcType=DOUBLE},
+				</if>
+				<if test="sysUser.bodyMind != null" >
+					body_mind = #{sysUser.bodyMind,jdbcType=DOUBLE},
+				</if>
+				<if test="sysUser.law != null" >
+					law = #{sysUser.law,jdbcType=DOUBLE},
+				</if>
+				<if test="sysUser.cultureSports != null" >
+					culture_sports = #{sysUser.cultureSports,jdbcType=DOUBLE},
+				</if>
+				<if test="sysUser.total != null" >
+					total = #{sysUser.total,jdbcType=DOUBLE},
+				</if>
+				<if test="sysUser.updateBy != null" >
+					update_by = #{sysUser.updateBy,jdbcType=VARCHAR},
+				</if>
+				<if test="sysUser.updateTime != null" >
+					update_time = #{sysUser.updateTime,jdbcType=DATE}
+				</if>
+			</set>
+			where id = #{sysUser.id,jdbcType=VARCHAR}
+		</foreach>
+	</update>
 </mapper>
