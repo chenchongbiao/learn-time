@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.learntime.mapper.ActivityRecordMapper">
+    <!--    https://www.cnblogs.com/quehai/p/10829360.html-->
+    <insert id ="insertActivityRecordBatch" parameterType="java.util.List" >
+        insert into activity_record
+        (id, activity_name, sponsor, uid, name, academy, clazz, join_type, award, credit_type, credit, contact, year, remark, to_name, create_by, create_time, sys_org_code)
+        values
+        <foreach collection ="list" item="activityRecord" index= "index" separator =",">
+            (
+                #{activityRecord.id},
+                #{activityRecord.activityName},
+                #{activityRecord.sponsor},
+                #{activityRecord.uid},
+                #{activityRecord.name},
+                #{activityRecord.academy},
+                #{activityRecord.clazz},
+                #{activityRecord.joinType},
+                #{activityRecord.award},
+                #{activityRecord.creditType},
+                #{activityRecord.credit},
+                #{activityRecord.contact},
+                #{activityRecord.year},
+                #{activityRecord.remark},
+                #{activityRecord.toName},
+                #{activityRecord.createBy},
+                #{activityRecord.createTime},
+                #{activityRecord.sysOrgCode}
+            )
+        </foreach>
+    </insert >
+
+    <!--https://blog.csdn.net/q957967519/article/details/88669552-->
+    <!--批量修改用户的学时信息信息-->
+    <update id="updateSysUserCredit">
+        <foreach collection="sysUserList" item="sysUser" index="index" open="" close="" separator=";">
+            update sys_user
+            <set>
+                <if test="sysUser.innovation != null" >
+                    innovation = #{sysUser.innovation,jdbcType=DOUBLE},
+                </if>
+                <if test="sysUser.thought != null" >
+                    thought = #{sysUser.thought,jdbcType=DOUBLE},
+                </if>
+                <if test="sysUser.bodyMind != null" >
+                    body_mind = #{sysUser.bodyMind,jdbcType=DOUBLE},
+                </if>
+                <if test="sysUser.law != null" >
+                    law = #{sysUser.law,jdbcType=DOUBLE},
+                </if>
+                <if test="sysUser.cultureSports != null" >
+                    culture_sports = #{sysUser.cultureSports,jdbcType=DOUBLE},
+                </if>
+                <if test="sysUser.updateBy != null" >
+                    update_by = #{sysUser.updateBy,jdbcType=VARCHAR},
+                </if>
+                <if test="sysUser.updateTime != null" >
+                    update_time = #{sysUser.updateTime,jdbcType=DATE}
+                </if>
+            </set>
+            where id = #{sysUser.id,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+    <select id="getActivityRecordByGradeWithOrgCode"  resultType="org.jeecg.modules.learntime.entity.ActivityRecord">
+        SELECT
+            activity_record.id,
+            activity_record.activity_name,
+            activity_record.sponsor,
+            activity_record.uid,
+            activity_record.`name`,
+            activity_record.clazz,
+            activity_record.academy,
+            activity_record.award,
+            activity_record.join_type,
+            activity_record.credit_type,
+            activity_record.credit,
+            activity_record.contact,
+            activity_record.`year`,
+            activity_record.remark,
+            activity_record.to_name,
+            activity_record.`status`,
+            activity_record.create_by,
+            activity_record.update_by,
+            activity_record.create_time,
+            activity_record.update_time
+        FROM
+            activity_record
+                INNER JOIN sys_user ON activity_record.uid = sys_user.username
+        WHERE
+            org_code = #{orgCode}
+        <if test="grade != null" >
+            AND grade = #{grade}
+        </if>
+    </select>
+
+    <select id="getActivityRecordByOrgCodeWithGradeTotal" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM
+        activity_record
+        INNER JOIN sys_user ON activity_record.uid = sys_user.username
+        WHERE
+        org_code = #{orgCode}
+        <if test="grade != null" >
+            AND grade = #{grade}
+        </if>
+    </select>
+
+</mapper>
