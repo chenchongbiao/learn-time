@@ -13,40 +13,51 @@
             </a-form-item>
           </a-col>
 
+<!--          <a-col :md="6" :sm="8">-->
+<!--            <a-form-item label="所在部门">-->
+<!--              <j-input placeholder="输入部门模糊查询" v-model="queryParam.orgCodeTxt"></j-input>-->
+<!--            </a-form-item>-->
+<!--          </a-col>-->
           <a-col :md="6" :sm="8">
-            <a-form-item label="所在部门">
-              <j-input placeholder="输入部门模糊查询" v-model="queryParam.orgCodeTxt"></j-input>
+            <a-form-item label="所在学院">
+              <a-select v-model="queryParam.orgCodeTxt" placeholder="请选择">
+                <a-select-option value="">请选择</a-select-option>
+                <a-select-option v-for="depart in departList" :key="depart.id" :value="depart.departName">
+                  {{ depart.departName }}
+                </a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
 
-          <!--          <a-col :md="6" :sm="8">-->
-          <!--            <a-form-item label="性别">-->
-          <!--              <a-select v-model="queryParam.sex" placeholder="请选择性别">-->
-          <!--                <a-select-option value="">请选择</a-select-option>-->
-          <!--                <a-select-option value="1">男</a-select-option>-->
-          <!--                <a-select-option value="2">女</a-select-option>-->
-          <!--              </a-select>-->
-          <!--            </a-form-item>-->
-          <!--          </a-col>-->
+          <a-col :md="6" :sm="8">
+            <a-form-item label="用户类型">
+              <a-select v-model="queryParam.userIdentity" placeholder="请选择">
+                <a-select-option value="">请选择</a-select-option>
+                <a-select-option value="1">普通用户</a-select-option>
+                <a-select-option value="2">上级用户</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+
+          <a-col :md="6" :sm="8">
+            <a-form-item label="真实名字">
+              <j-input placeholder="请输入真实名字" v-model="queryParam.realname"></j-input>
+            </a-form-item>
+          </a-col>
+
 
 
           <template v-if="toggleSearchStatus">
-            <a-col :md="6" :sm="8">
-              <a-form-item label="真实名字">
-                <j-input placeholder="请输入真实名字" v-model="queryParam.realname"></j-input>
-              </a-form-item>
-            </a-col>
-
             <a-col :md="6" :sm="8">
               <a-form-item label="年级">
                 <a-input placeholder="请输入年级" v-model="queryParam.grade"></a-input>
               </a-form-item>
             </a-col>
-            <!--            <a-col :md="6" :sm="8">-->
-            <!--              <a-form-item label="手机号码">-->
-            <!--                <a-input placeholder="请输入手机号码查询" v-model="queryParam.phone"></a-input>-->
-            <!--              </a-form-item>-->
-            <!--            </a-col>-->
+            <a-col :md="6" :sm="8">
+              <a-form-item label="班级">
+                <j-input placeholder="请输入班级进行模糊查询" v-model="queryParam.clazz"></j-input>
+              </a-form-item>
+            </a-col>
 
             <a-col :md="6" :sm="8">
               <a-form-item label="用户状态">
@@ -194,7 +205,7 @@
 import UserModal from './modules/UserModal'
 import PasswordModal from './modules/PasswordModal'
 import {putAction,getFileAccessHttpUrl} from '@/api/manage';
-import {frozenBatch} from '@/api/api'
+import { frozenBatch, queryDepartTreeSync } from '@/api/api'
 import {JeecgListMixin} from '@/mixins/JeecgListMixin'
 import SysUserAgentModal from "./modules/SysUserAgentModal";
 import JInput from '@/components/jeecg/JInput'
@@ -259,67 +270,26 @@ export default {
           dataIndex: 'grade',
           sorter: true
         },
-        // {
-        //   title: '班级',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'clazz',
-        //   sorter: true
-        // },
-        // {
-        //   title: '创新创业素质学时',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'innovation',
-        //   sorter: true
-        // },
-        // {
-        //   title: '思想品德素质学时',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'thought',
-        //   sorter: true
-        // },
-        // {
-        //   title: '身心素质学时',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'bodyMind',
-        //   sorter: true
-        // },
-        // {
-        //   title: '法律素养学时',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'law',
-        //   sorter: true
-        // },
-        // {
-        //   title: '文体素质学时',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'cultureSports',
-        //   sorter: true
-        // },
-        // {
-        //   title: '性别',
-        //   align: "center",
-        //   width: 80,
-        //   dataIndex: 'sex_dictText',
-        //   sorter: true
-        // },
-        // {
-        //   title: '生日',
-        //   align: "center",
-        //   width: 100,
-        //   dataIndex: 'birthday'
-        // },
-        // {
-        //   title: '手机号码',
-        //   align: "center",
-        //   width: 100,
-        //   dataIndex: 'phone'
-        // },
+        {
+          title: '班级',
+          align: "center",
+          width: 80,
+          dataIndex: 'clazz',
+          sorter: true
+        },
+        {
+          title: '所在部门',
+          align: "center",
+          width: 100,
+          dataIndex: 'orgCodeTxt',
+          sorter: true
+        },
+        {
+          title: '部门编号',
+          align: "center",
+          width: 180,
+          dataIndex: 'orgCode'
+        },
         {
           title: '负责部门',
           align: "center",
@@ -356,6 +326,7 @@ export default {
         exportXlsUrlTamp: "/sys/user/exportXlsTamp",
         importExcelUrl: "sys/user/importExcel",
       },
+      departList: []
     }
   },
   computed: {
@@ -363,11 +334,16 @@ export default {
       return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
     }
   },
+  created() {
+    this.initData()
+  },
   methods: {
+    initData(){
+      this.getDepartList()
+    },
     getAvatarView: function (avatar) {
       return getFileAccessHttpUrl(avatar)
     },
-
     batchFrozen: function (status) {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.warning('请选择一条记录！');
@@ -441,6 +417,16 @@ export default {
       if (isToLocal) {
         this.loadData()
       }
+    },
+    getDepartList() {
+      // 学院的父id
+      let parentId = "604023e70310485d9b9b779c8983f34c"
+      queryDepartTreeSync({pid:parentId}).then((res) => {
+        if (res.success) {
+          this.departList = res.result
+        }
+      })
+      console.log(this.departList)
     },
   }
 
