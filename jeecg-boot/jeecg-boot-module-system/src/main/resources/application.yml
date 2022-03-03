@@ -1,4 +1,7 @@
 spring:
+  resources:
+  #这个节点配置是设置静态文件存放的路径
+  static-locations: classpath:/static
   application:
     name: jeecg-system
   profiles:
