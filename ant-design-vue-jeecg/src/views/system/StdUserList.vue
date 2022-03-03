@@ -7,33 +7,38 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="12">
-            <a-form-item label="账号">
-              <!--<a-input placeholder="请输入账号查询" v-model="queryParam.username"></a-input>-->
-              <j-input placeholder="输入账号模糊查询" v-model="queryParam.username"></j-input>
-            </a-form-item>
-          </a-col>
-
-          <a-col :md="6" :sm="8">
-            <a-form-item label="所属学院">
-              <j-input placeholder="输入学院模糊查询" v-model="queryParam.orgCodeTxt"></j-input>
+            <a-form-item label="学号">
+              <a-input placeholder="请输入学号查询" v-model="queryParam.username"></a-input>
+<!--              <j-input placeholder="输入账号模糊查询" v-model="queryParam.username"></j-input>-->
             </a-form-item>
           </a-col>
 
 <!--          <a-col :md="6" :sm="8">-->
-<!--            <a-form-item label="性别">-->
-<!--              <a-select v-model="queryParam.sex" placeholder="请选择性别">-->
-<!--                <a-select-option value="">请选择</a-select-option>-->
-<!--                <a-select-option value="1">男</a-select-option>-->
-<!--                <a-select-option value="2">女</a-select-option>-->
-<!--              </a-select>-->
+<!--            <a-form-item label="所属学院">-->
+<!--              <j-input placeholder="输入学院模糊查询" v-model="queryParam.orgCodeTxt"></j-input>-->
 <!--            </a-form-item>-->
 <!--          </a-col>-->
+          <a-col :md="6" :sm="8">
+            <a-form-item label="名字">
+              <j-input placeholder="请输入名字" v-model="queryParam.realname"></j-input>
+            </a-form-item>
+          </a-col>
 
+          <a-col :md="6" :sm="8">
+            <a-form-item label="所在学院">
+              <a-select v-model="queryParam.orgCodeTxt" placeholder="请选择">
+                <a-select-option value="">请选择</a-select-option>
+                <a-select-option v-for="depart in departList" :key="depart.id" :value="depart.departName">
+                  {{ depart.departName }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
 
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
-              <a-form-item label="真实名字">
-                <j-input placeholder="请输入真实名字" v-model="queryParam.realname"></j-input>
+              <a-form-item label="班级">
+                <j-input placeholder="请输入班级进行模糊查询" v-model="queryParam.clazz"></j-input>
               </a-form-item>
             </a-col>
 
@@ -195,7 +200,7 @@
   import UserModal from './modules/StdUserModal'
   import PasswordModal from './modules/PasswordModal'
   import {putAction,getFileAccessHttpUrl} from '@/api/manage';
-  import {frozenBatch} from '@/api/api'
+  import { frozenBatch, queryDepartTreeSync } from '@/api/api'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import SysUserAgentModal from "./modules/SysUserAgentModal";
   import JInput from '@/components/jeecg/JInput'
@@ -268,6 +273,19 @@
             sorter: true
           },
           {
+            title: '所在学院',
+            align: "center",
+            width: 180,
+            dataIndex: 'orgCodeTxt'
+          },
+          {
+            title: '总学时',
+            align: "center",
+            width: 100,
+            dataIndex: 'total',
+            sorter: true
+          },
+          {
             title: '创新创业素质',
             align: "center",
             width: 100,
@@ -321,12 +339,6 @@
           //   width: 100,
           //   dataIndex: 'phone'
           // },
-          {
-            title: '所在学院',
-            align: "center",
-            width: 180,
-            dataIndex: 'orgCodeTxt'
-          },
           // {
           //   title: '所在部门编码',
           //   align: "center",
@@ -370,6 +382,9 @@
           importExcelUrl: "sys/user/importExcel",
         },
       }
+    },
+    created() {
+      this.getDepartList()
     },
     computed: {
       importExcelUrl: function(){
@@ -454,6 +469,16 @@
         if (isToLocal) {
           this.loadData()
         }
+      },
+      getDepartList() {
+        // 学院的父id
+        let parentId = "604023e70310485d9b9b779c8983f34c"
+        queryDepartTreeSync({pid:parentId}).then((res) => {
+          if (res.success) {
+            this.departList = res.result
+          }
+        })
+        console.log(this.departList)
       },
     }
 
