@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sun.xml.bind.v2.TODO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -129,6 +130,66 @@ public class SysUserController {
 		return result;
 	}
 
+    /**
+     * 获取学生用户列表数据
+     * @param user
+     * @param pageNo
+     * @param pageSize
+     * @param req
+     * @return
+     */
+    @PermissionData(pageComponent = "system/StdUserList")
+    @RequestMapping(value = "/stdlist", method = RequestMethod.GET)
+    public Result<IPage<SysUser>> queryPageStdList(SysUser user,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+                                                @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,HttpServletRequest req) {
+        Result<IPage<SysUser>> result = new Result<IPage<SysUser>>();
+        QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
+        //TODO 外部模拟登陆临时账号，列表不显示
+        queryWrapper.ne("username","_reserve_user_external");
+
+        // 查询user_identity字段等于1的用户，即学生
+        queryWrapper.eq("user_identity",1);
+
+        // 获取登录的用户信息
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser sysUser = sysUserService.getUserByName(loginUser.getUsername());
+
+        /**
+         * 获取部门编号 每三个字符作为划分，左边相同则代表为上级部门
+         * A12编号为广州商学院 A12A05为会计学院，左三个字符相同表示广州商学院是会计学院的上级部门
+         * 若有A12A05B01编号的部门，左侧A12A05与会计学院相同表示会计学院是该部门的上级，以此类推
+         */
+        Integer orgCodeLen = sysUser.getOrgCode().length();
+        switch (orgCodeLen){
+            // 六个字符表示二级部门为各级学院,则只能查看该部门下的成员
+            case 6:
+                // 如果没有设置年级则该学院的所有年级如团委会学生会等,如果设置了则需要添加年级
+                if (sysUser.getGrade() != null){
+                    queryWrapper.eq("grade",sysUser.getGrade());
+                }
+                queryWrapper.eq("org_code",sysUser.getOrgCode());
+        }
+
+        Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
+        IPage<SysUser> pageList = sysUserService.page(page, queryWrapper);
+
+        //批量查询用户的所属部门
+        //step.1 先拿到全部的 useids
+        //step.2 通过 useids，一次性查询用户的所属部门名字
+//        List<String> userIds = pageList.getRecords().stream().map(SysUser::getId).collect(Collectors.toList());
+//        if(userIds!=null && userIds.size()>0){
+//            Map<String,String>  useDepNames = sysUserService.getDepNamesByUserIds(userIds);
+//            pageList.getRecords().forEach(item->{
+//                item.setOrgCodeTxt(useDepNames.get(item.getId()));
+//            });
+//        }
+
+        result.setSuccess(true);
+        result.setResult(pageList);
+        log.info(pageList.toString());
+        return result;
+    }
+
     //@RequiresRoles({"admin"})
     //@RequiresPermissions("user:add")
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
@@ -137,14 +198,38 @@ public class SysUserController {
 		String selectedRoles = jsonObject.getString("selectedroles");
 		String selectedDeparts = jsonObject.getString("selecteddeparts");
 		try {
+            // 把前端发来的json数据转换为对象
 			SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
 			user.setCreateTime(new Date());//设置创建时间
+            // 产生随机盐
 			String salt = oConvertUtils.randomGen(8);
 			user.setSalt(salt);
 			String passwordEncode = PasswordUtil.encrypt(user.getUsername(), user.getPassword(), salt);
 			user.setPassword(passwordEncode);
 			user.setStatus(1);
 			user.setDelFlag(CommonConstant.DEL_FLAG_0);
+
+            // 如果是上级用户修改部门数据
+            if (user.getUserIdentity() == 2){
+                // 获取部门数据
+                SysDepart sysDepart = sysDepartService.getById(selectedDeparts);
+                // 给用户添加org_code 部门的编码
+                user.setOrgCode(sysDepart.getOrgCode());
+                // 设置部门的名称 在这指学院
+                user.setOrgCodeTxt(sysDepart.getDepartName());
+            }
+
+            // 如果是普通用户即学生则添加学生等数据
+            if (user.getUserIdentity() == 1) {
+                // 设置学时，添加用户默认为0.0
+                user.setInnovation(0.0);
+                user.setThought(0.0);
+                user.setBodyMind(0.0);
+                user.setLaw(0.0);
+                user.setCultureSports(0.0);
+            }
+
+
 			// 保存用户走一个service 保证事务
 			sysUserService.saveUser(user, selectedRoles, selectedDeparts);
 			result.success("添加成功！");
@@ -176,6 +261,15 @@ public class SysUserController {
                     //vue3.0前端只传递了departIds
                     departs=user.getDepartIds();
                 }
+                if (user.getUserIdentity() == 2){
+                    // 获取部门数据
+                    SysDepart sysDepart = sysDepartService.getById(departs);
+                    // 给用户添加org_code 部门的编码
+                    user.setOrgCode(sysDepart.getOrgCode());
+                    // 设置部门的名称 在这指学院
+                    user.setOrgCodeTxt(sysDepart.getDepartName());
+                }
+
                 // 修改用户走一个service 保证事务
 				sysUserService.editUser(user, roles, departs);
 				result.success("修改成功!");
@@ -433,13 +527,64 @@ public class SysUserController {
         //导出文件名称
         mv.addObject(NormalExcelConstants.FILE_NAME, "用户列表");
         mv.addObject(NormalExcelConstants.CLASS, SysUser.class);
-		LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        ExportParams exportParams = new ExportParams("用户列表数据", "导出人:"+user.getRealname(), "导出信息");
+//		LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        ExportParams exportParams = new ExportParams("用户列表", "导出信息");
         exportParams.setImageBasePath(upLoadPath);
+
+        /**
+         * 修改逻辑
+         */
+
+
         mv.addObject(NormalExcelConstants.PARAMS, exportParams);
         mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
         return mv;
     }
+
+    /**
+     * 导出excel模板
+     *
+     * @param request
+     * @param sysUser
+     */
+    @RequestMapping(value = "/exportXlsTamp")
+    public ModelAndView exportXlsTamp(SysUser sysUser,HttpServletRequest request) {
+        // Step.1 组装查询条件
+//        QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(sysUser, request.getParameterMap());
+
+        //update-begin--Author:kangxiaolin  Date:20180825 for：[03]用户导出，如果选择数据则只导出相关数据--------------------
+//        String selections = request.getParameter("selections");
+//        if(!oConvertUtils.isEmpty(selections)){
+//            queryWrapper.in("id",selections.split(","));
+//        }
+
+        //Step.1 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        //update-end--Author:kangxiaolin  Date:20180825 for：[03]用户导出，如果选择数据则只导出相关数据----------------------
+        List<SysUser> pageList = new ArrayList<SysUser>();
+        SysUser userTamp = new SysUser();
+        userTamp.setUsername("201906050052");
+        userTamp.setRealname("陈崇标");
+        userTamp.setGrade(2019);
+        userTamp.setClazz("软工1901班");
+        userTamp.setOrgCodeTxt("信息技术与工程学院");
+        pageList.add(userTamp);
+
+        //导出文件名称
+        mv.addObject(NormalExcelConstants.FILE_NAME, "用户信息模板");
+        mv.addObject(NormalExcelConstants.CLASS, SysUser.class);
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        ExportParams exportParams = new ExportParams("用户信息模板", "导出信息");
+        exportParams.setImageBasePath(upLoadPath);
+
+        /**
+         * 修改逻辑
+         */
+        mv.addObject(NormalExcelConstants.PARAMS, exportParams);
+        mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
+        return mv;
+    }
+
 
     /**
      * 通过excel导入数据
@@ -460,9 +605,17 @@ public class SysUserController {
         for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
             MultipartFile file = entity.getValue();// 获取上传文件对象
             ImportParams params = new ImportParams();
-            params.setTitleRows(2);
+            // 表格标题所占据的行数,默认0，代表没有标题
+            params.setTitleRows(1);
+            // 表头所占据的行数行数,默认1，代表标题占据一行
             params.setHeadRows(1);
             params.setNeedSave(true);
+
+            /**
+             * 修改导入逻辑
+             */
+
+
             try {
                 List<SysUser> listSysUsers = ExcelImportUtil.importExcel(file.getInputStream(), SysUser.class, params);
                 for (int i = 0; i < listSysUsers.size(); i++) {
@@ -476,8 +629,38 @@ public class SysUserController {
                     sysUserExcel.setSalt(salt);
                     String passwordEncode = PasswordUtil.encrypt(sysUserExcel.getUsername(), sysUserExcel.getPassword(), salt);
                     sysUserExcel.setPassword(passwordEncode);
+
+                    // 设置默认用户状态1
+                    sysUserExcel.setStatus(1);
+                    // 设置删除状态0
+                    sysUserExcel.setDelFlag(0);
+                    // 同步工作流引擎1同步0不同步
+                    sysUserExcel.setActivitiSync(1);
+                    if (sysUserExcel.getUserIdentity() == 1) {
+                        // 设置学时，添加用户默认为0.0
+                        sysUserExcel.setInnovation(0.0);
+                        sysUserExcel.setThought(0.0);
+                        sysUserExcel.setBodyMind(0.0);
+                        sysUserExcel.setLaw(0.0);
+                        sysUserExcel.setCultureSports(0.0);
+                    }
+                    // 获取部门所有数据
+                    List<SysDepart> departList = sysDepartService.list();
+                    String orgCodeTxt = sysUserExcel.getOrgCodeTxt();
+                    for(SysDepart depart: departList){
+                        String departName = depart.getDepartName();
+                        if (departName.equals(orgCodeTxt)){
+                            // 设置部门编码
+                            sysUserExcel.setOrgCode(depart.getOrgCode());
+                        }
+                    }
+
                     try {
-                        sysUserService.save(sysUserExcel);
+//                        sysUserService.save(sysUserExcel);
+
+//                        sysUserService.addUserWithRole(sysUserExcel,"1481501160333484033");//默认角色 院管理员
+                        // 导入用户默认为学生权限
+                        sysUserService.addUserWithRole(sysUserExcel,"1467848978170368002");//默认角色 学生
                         successLines++;
                     } catch (Exception e) {
                         errorLines++;
@@ -486,14 +669,14 @@ public class SysUserController {
                         // 通过索引名判断出错信息
                         if (message.contains(CommonConstant.SQL_INDEX_UNIQ_SYS_USER_USERNAME)) {
                             errorMessage.add("第 " + lineNumber + " 行：用户名已经存在，忽略导入。");
-                        } else if (message.contains(CommonConstant.SQL_INDEX_UNIQ_SYS_USER_WORK_NO)) {
-                            errorMessage.add("第 " + lineNumber + " 行：工号已经存在，忽略导入。");
+//                        } else if (message.contains(CommonConstant.SQL_INDEX_UNIQ_SYS_USER_WORK_NO)) {
+//                            errorMessage.add("第 " + lineNumber + " 行：工号已经存在，忽略导入。");
                         } else if (message.contains(CommonConstant.SQL_INDEX_UNIQ_SYS_USER_PHONE)) {
                             errorMessage.add("第 " + lineNumber + " 行：手机号已经存在，忽略导入。");
                         } else if (message.contains(CommonConstant.SQL_INDEX_UNIQ_SYS_USER_EMAIL)) {
                             errorMessage.add("第 " + lineNumber + " 行：电子邮件已经存在，忽略导入。");
                         } else {
-                            errorMessage.add("第 " + lineNumber + " 行：未知错误，忽略导入");
+                            errorMessage.add("第 " + lineNumber + " 行：未知错误，忽略导入,请联系管理员查看日志");
                             log.error(e.getMessage(), e);
                         }
                     }
@@ -938,7 +1121,7 @@ public class SysUserController {
 			user.setStatus(CommonConstant.USER_UNFREEZE);
 			user.setDelFlag(CommonConstant.DEL_FLAG_0);
 			user.setActivitiSync(CommonConstant.ACT_SYNC_0);
-			sysUserService.addUserWithRole(user,"ee8626f80f7c2619917b6236f3a7f02b");//默认临时角色 test
+			sysUserService.addUserWithRole(user,"1467848978170368002");//默认角色 学生
 			result.success("注册成功");
 		} catch (Exception e) {
 			result.error500("注册失败");
