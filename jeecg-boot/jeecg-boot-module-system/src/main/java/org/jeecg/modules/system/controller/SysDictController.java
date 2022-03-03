@@ -135,8 +135,8 @@ public class SysDictController {
 		String text = null;
 		try {
 			text = sysDictService.queryDictTextByKey(dictCode, key);
-			 result.setSuccess(true);
-			 result.setResult(text);
+			result.setSuccess(true);
+			result.setResult(text);
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
 			result.error500("操作失败");
